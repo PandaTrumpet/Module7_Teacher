@@ -6,8 +6,9 @@ import validateBody from '../utils/validateBody.js';
 import {
   userSignupSchema,
   userSigninSchema,
+  userGoogleAuthSchema,
 } from '../validation/user-schemas.js';
-
+import { authGoogleController } from '../controllers/auth-controllers.js';
 import {
   signupController,
   verifyController,
@@ -34,7 +35,11 @@ authRouter.post(
 );
 
 authRouter.post('/refresh', ctrlWrapper(refreshController));
-
+authRouter.post(
+  '/confirm-google-auth',
+  validateBody(userGoogleAuthSchema),
+  ctrlWrapper(authGoogleController),
+);
 authRouter.post('/signout', ctrlWrapper(signoutController));
 authRouter.get('/get-oauth-url', ctrlWrapper(getGoogleOAuthController));
 

@@ -10,12 +10,17 @@ import {
   findSession,
   deleteSession,
 } from '../services/session-services.js';
-import { generateAuthUrl } from '../utils/googleOAuth2.js';
+import {
+  generateAuthUrl,
+  getGoogleOAuthName,
+  validateCode,
+} from '../utils/googleOAuth2.js';
 import { compareHash } from '../utils/hash.js';
 import sendEmail from '../utils/sendEmail.js';
 import env from '../utils/env.js';
 
 import { TEMPLATES_DIR } from '../constants/index.js';
+import { randomBytes } from 'node:crypto';
 
 const app_domain = env('APP_DOMAIN');
 const jwt_secret = env('JWT_SECRET');
@@ -180,5 +185,36 @@ export const getGoogleOAuthController = async (req, res) => {
     status: 200,
     message: 'Google OAuth url generate successful',
     data: { url },
+  });
+};
+export const authGoogleController = async (req, res) => {
+  const { code } = req.body;
+  const ticket = await validateCode(code);
+  const userPayload = ticket.getPayload();
+  // userPayload.given_name, - имя
+  // userPayload.family_name - фамилия
+  if (!userPayload) {
+    throw createHttpError(401);
+  }
+  let user = await findUser({ email: userPayload.email });
+  if (!user) {
+    const signupData = {
+      email: userPayload.email,
+      password: randomBytes(10),
+      name: getGoogleOAuthName(userPayload),
+    };
+    user = await signup(signupData);
+  }
+
+  const session = await createSession(user._id);
+
+  setupResponseSession(res, session);
+
+  res.json({
+    status: 200,
+    message: 'User signin successfully',
+    data: {
+      accessToken: session.accessToken,
+    },
   });
 };
