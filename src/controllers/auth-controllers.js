@@ -173,3 +173,12 @@ export const signoutController = async (req, res) => {
 
   res.status(204).send();
 };
+
+export const getGoogleOAuthController = async (req, res) => {
+  const url = generateAuthUrl();
+  res.json({
+    status: 200,
+    message: 'Google OAuth url generate successful',
+    data: { url },
+  });
+};

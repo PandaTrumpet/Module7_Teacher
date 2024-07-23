@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { env } from './env.js';
+import env from './env.js';
 const googleAuthSettingsPath = path.resolve('google-oauth.json');
 const googleAuthSettings = JSON.parse(await readFile(googleAuthSettingsPath));
 const clientId = env('GOOGLE_AUTH_CLIENT_ID');
@@ -15,7 +15,7 @@ const googleOauthClient = new OAuth2Client({
 });
 
 export const generateAuthUrl = () => {
-  googleOauthClient.generateAuthUrl({
+  return googleOauthClient.generateAuthUrl({
     scope: [
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',
