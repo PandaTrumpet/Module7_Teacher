@@ -1,0 +1,57 @@
+tags:
+  - Movie
+summary: Create movie
+operationId: createMovie
+description: 'Create a movie with payload'
+security:
+  - bearerAuth: []
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - title
+          - director
+          - releaseYear
+          - poster
+        properties:
+          title:
+            description: "Movies's name"
+            type: string
+          director:
+            description: "Movie's director"
+            type: string
+            example: 'James Cameron'
+          releaseYear:
+            description: 'Date of film'
+            type: number
+            example: 2004
+          poster:
+            description: "Link to movie's poster"
+            type: string
+            example: https://res.cloudinary.com/uqwgdu/image/upload/image.png
+
+responses:
+  '201':
+    description: Creates a movie
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully created a movie!
+            data:
+              type: object
+              $ref: '../../components/schemas/movies.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
